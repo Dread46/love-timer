@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Рисуй с любовью</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    canvas {
+      border: 2px solid hotpink;
+      border-radius: 10px;
+      cursor: crosshair;
+    }
+    .toolbar {
+      margin-bottom: 10px;
+    }
+    button {
+      background: hotpink;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    button:hover {
+      background: deeppink;
+    }
+    a {
+      color: hotpink;
+      margin-top: 10px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button onclick="clearCanvas()">Очистить</button>
+    <button onclick="changeColor()">Цвет</button>
+  </div>
+  <canvas id="drawCanvas" width="800" height="500"></canvas>
+  <a href="index.html">← Назад</a>
+
+  <script>
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let currentColor = 'hotpink';
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseout', () => drawing = false);
+
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+      if (!drawing) return;
+
+      const rect = canvas.getBoundingClientRect();
+      ctx.fillStyle = currentColor;
+      ctx.beginPath();
+      ctx.arc(e.clientX - rect.left, e.clientY - rect.top, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function changeColor() {
+      const colors = ['hotpink', 'red', 'white', 'yellow', 'lime', 'cyan'];
+      const index = colors.indexOf(currentColor);
+      currentColor = colors[(index + 1) % colors.length];
+    }
+  </script>
+</body>
+</html>
