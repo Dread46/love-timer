@@ -5,7 +5,6 @@
   <title>Я люблю тебя коть</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Стили остаются без изменений */
     html, body {
       margin: 0;
       padding: 0;
@@ -42,35 +41,34 @@
     }
 
     .top-text {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  text-align: center;
-  font-size: 4vh; /* размер больше */
-  padding: 15px 0;
-  background: rgba(0, 0, 0, 0.6);
-  color: #ff69b4; /* яркий розовый */
-  font-weight: bold; /* жирный шрифт */
-  text-shadow: 2px 2px 6px #ff1493; /* яркая тень */
-  border-bottom: 2px solid #ff69b4; /* нижняя граница */
-  z-index: 2;
-}
+      position: fixed;
+      top: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 4vh;
+      padding: 15px 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: #ff69b4;
+      font-weight: bold;
+      text-shadow: 2px 2px 6px #ff1493;
+      border-bottom: 2px solid #ff69b4;
+      z-index: 2;
+    }
 
-.timer {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 5vh; /* крупнее */
-  color: white; /* яркий цвет */
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 20px 30px;
-  border-radius: 15px;
-  text-shadow: 2px 2px 8px #ff69b4; /* тень поярче */
-  z-index: 3;
-}
-
+    .timer {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5vh;
+      color: white;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px 30px;
+      border-radius: 15px;
+      text-shadow: 2px 2px 8px #ff69b4;
+      z-index: 3;
+    }
 
     .heart {
       position: absolute;
@@ -87,10 +85,8 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    .music-toggle {
+    .music-toggle, .btn-link {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
       background: rgba(255, 255, 255, 0.2);
       color: hotpink;
       border: 2px solid hotpink;
@@ -103,18 +99,25 @@
       transition: background 0.3s;
     }
 
-    .music-toggle:hover {
+    .music-toggle:hover, .btn-link:hover {
       background: rgba(255, 255, 255, 0.4);
     }
+
+    .music-toggle { bottom: 20px; right: 20px; }
+    .btn-photo { bottom: 70px; right: 20px; }
+    .btn-draw { bottom: 120px; right: 20px; }
   </style>
 </head>
 <body onclick="handleClick(event)">
   <div id="bg"></div>
-
   <canvas id="matrixCanvas"></canvas>
+
   <div class="top-text">Я люблю тебя коть, мы со всем справимся! Больше отдыхай!</div>
   <div class="timer" id="timer">Загрузка...</div>
+
   <div class="music-toggle" onclick="toggleMusic(event)">🔊 Музыка</div>
+  <div class="btn-link btn-photo" onclick="location.href='фото.html'">📷 Фото</div>
+  <div class="btn-link btn-draw" onclick="location.href='рисунки.html'">🎨 Рисовать</div>
 
   <audio id="bgMusic" loop>
     <source src="muzlo.mp3" type="audio/mpeg">
@@ -124,90 +127,55 @@
   <script>
     const canvas = document.getElementById("matrixCanvas");
     const ctx = canvas.getContext("2d");
-
-    // Исходные данные
-    const phrase = "Я люблю тебя коть";
+    const phrase = "I love you";
     const letters = phrase.split('');
     const fontSize = 24;
-    const columnSpacing = fontSize * 1.2; // Расстояние между столбцами
-    
+    const columnSpacing = fontSize * 1.2;
     let columns = [];
     let animationId;
 
-    // Инициализация матрицы
     function initMatrix() {
-      // Устанавливаем размеры canvas
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      
-      // Рассчитываем количество столбцов
       const columnCount = Math.floor(canvas.width / columnSpacing);
-      
-      // Инициализируем столбцы
       columns = Array(columnCount).fill().map((_, i) => ({
         x: i * columnSpacing,
-        y: -Math.random() * canvas.height, // Начальная позиция выше экрана
-        speed: 1 + Math.random() * 3, // Случайная скорость
-        chars: Array(Math.floor(canvas.height / fontSize) + 2).fill('') // Символы в столбце
+        y: -Math.random() * canvas.height,
+        speed: 1 + Math.random() * 3,
+        chars: Array(Math.floor(canvas.height / fontSize) + 2).fill('')
       }));
-      
-      // Заполняем начальные символы
       columns.forEach(col => {
         col.chars = col.chars.map(() => letters[Math.floor(Math.random() * letters.length)]);
       });
-      
-      // Останавливаем предыдущую анимацию, если есть
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
-      
-      // Запускаем отрисовку
+      if (animationId) cancelAnimationFrame(animationId);
       draw();
     }
 
-    // Отрисовка матрицы
     function draw() {
-      // Очищаем canvas с полупрозрачным фоном для эффекта шлейфа
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Устанавливаем стиль для символов
-      ctx.fillStyle = "#ffb6c1";
-      ctx.font = `${fontSize}px monospace`;
-      
-      // Рисуем каждый столбец
+      ctx.font = fontSize + "px monospace";
+
       columns.forEach(column => {
-        // Обновляем позицию столбца
         column.y += column.speed;
-        
-        // Если столбец ушел за нижнюю границу, возвращаем его вверх
         if (column.y > fontSize) {
           column.y = 0;
-          // Сдвигаем символы вниз
           column.chars.pop();
           column.chars.unshift(letters[Math.floor(Math.random() * letters.length)]);
         }
-        
-        // Рисуем символы столбца
         column.chars.forEach((char, i) => {
-          // Прозрачность уменьшается к верхним символам
           const alpha = 1 - (i / column.chars.length);
           ctx.fillStyle = `rgba(255, 182, 193, ${alpha})`;
           ctx.fillText(char, column.x, column.y + i * fontSize);
         });
       });
-      
-      // Запрашиваем следующий кадр анимации
+
       animationId = requestAnimationFrame(draw);
     }
 
-    // Обработчик изменения размера окна
     window.addEventListener("resize", initMatrix);
-    
-    // Запускаем матрицу
     initMatrix();
 
-    // Таймер (остается без изменений)
     function updateTimer() {
       const startDate = new Date('2024-12-01T00:00:00');
       const now = new Date();
@@ -228,7 +196,6 @@
     updateTimer();
     setInterval(updateTimer, 60000);
 
-    // Переключение музыки (остается без изменений)
     function toggleMusic(e) {
       e.stopPropagation();
       const music = document.getElementById("bgMusic");
@@ -241,7 +208,6 @@
       }
     }
 
-    // Обработчик клика для сердечек (остается без изменений)
     function handleClick(event) {
       const heart = document.createElement("div");
       heart.className = "heart";
